@@ -1,0 +1,22 @@
+[project]
+name = "treds"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "altair>=5.5.0",
+    "jupyterlab>=4.3.5",
+    "jupyterlab-vim>=4.1.4",
+    "matplotlib>=3.10.0",
+    "pandas>=2.2.3",
+    "plotly>=6.0.0",
+    "pyreadstat>=1.2.8",
+    "scikit-learn>=1.6.1",
+    "seaborn>=0.13.2",
+    "statsmodels>=0.14.4",
+    "tqdn>=0.2.1",
+]
+
+[tool.uv.workspace]
+members = ["test"]
