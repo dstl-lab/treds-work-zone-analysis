@@ -28,7 +28,7 @@ pio.templates["dsc80"] = go.layout.Template(
 pio.templates.default = "simple_white+dsc80"
 
 set_matplotlib_formats("svg")
-sns.set_context("poster")
+sns.set_context("notebook")
 sns.set_style("whitegrid")
 plt.rcParams["figure.figsize"] = (10, 5)
 
@@ -39,7 +39,7 @@ pd.set_option("display.max_columns", 8)
 pd.set_option("display.precision", 2)
 
 # Use plotly as default plotting engine
-pd.options.plotting.backend = "plotly"
+# pd.options.plotting.backend = "plotly"
 
 
 def display_df(
