@@ -10,3 +10,6 @@ push: ## pushes changes
 	git commit -m "Update $(TODAY)" --allow-empty
 	git pull origin main
 	git push origin main
+
+lab: ## runs jupyterlab
+	uv run jupyter lab

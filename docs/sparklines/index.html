@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TREDS Sparklines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm",
+          "@observablehq/plot": "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container mx-auto my-8 px-4">
+      <h1 class="text-3xl text-center mb-4">TREDS Sparklines</h1>
+      <p class="text-center mb-8">
+        This page contains sparklines for each vehicle in the TREDS dataset.
+        Note that this page loads a 100 MB dataset, so it may take a while to
+        load! The sparklines are split by workzone, and the plots are grouped
+        together by the timestamp of the vehicle visit. Control group vehicles
+        are on the left, and test group vehicles are on the right.
+      </p>
+      <div
+        id="selector-container"
+        class="mb-4 grid grid-cols-11 grid-auto-rows-max"
+      ></div>
+      <div id="control-threshold-container" class="mb-2">
+        <label for="control-threshold" class="mr-2"
+          >Min Control Vehicles:</label
+        >
+        <input
+          type="number"
+          id="control-threshold"
+          name="control-threshold"
+          min="0"
+          value="1"
+          class="border rounded px-2 py-1"
+        />
+      </div>
+      <div id="time-interval-selector" class="mb-4 flex items-center space-x-2">
+        <label class="mr-2">Time Interval Duration:</label>
+        <button
+          data-interval="30"
+          class="time-interval-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded text-sm"
+        >
+          30 min
+        </button>
+        <button
+          data-interval="60"
+          class="time-interval-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded text-sm"
+        >
+          1 hr
+        </button>
+        <button
+          data-interval="120"
+          class="time-interval-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded text-sm"
+        >
+          2 hr
+        </button>
+        <button
+          data-interval="240"
+          class="time-interval-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded text-sm"
+        >
+          4 hr
+        </button>
+        <button
+          data-interval="360"
+          class="time-interval-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded text-sm"
+        >
+          6 hr
+        </button>
+        <button
+          data-interval="720"
+          class="time-interval-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded text-sm"
+        >
+          12 hr
+        </button>
+        <button
+          data-interval="1440"
+          class="time-interval-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-2 rounded text-sm"
+        >
+          24 hr
+        </button>
+      </div>
+      <div id="plots-container"></div>
+    </div>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

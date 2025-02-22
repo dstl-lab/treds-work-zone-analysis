@@ -3,9 +3,10 @@ name = "treds"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12.6"
 dependencies = [
     "altair>=5.5.0",
+    "black>=25.1.0",
     "ipywidgets>=8.1.5",
     "jupyterlab>=4.3.5",
     "jupyterlab-vim>=4.1.4",
@@ -16,7 +17,7 @@ dependencies = [
     "scikit-learn>=1.6.1",
     "seaborn>=0.13.2",
     "statsmodels>=0.14.4",
-    "tqdn>=0.2.1",
+    "tqdm>=4.67.1",
 ]
 
 [tool.uv.workspace]
