@@ -2,9 +2,6 @@
 /raw_data/
 /data/
 
-# Use gzip compression on Github pages so we ignore the uncompressed file
-docs/data/filtered-work-zones-grouped.json
-
 # Created by https://www.toptal.com/developers/gitignore/api/python,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos
 

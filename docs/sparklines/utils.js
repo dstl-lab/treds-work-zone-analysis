@@ -37,14 +37,14 @@ import * as d3 from 'd3';
 import * as Plot from '@observablehq/plot';
 
 // Determine data URL based on hostname
-let dataUrl;
-const hostname = window.location.hostname;
-if (hostname === 'localhost' || hostname === '127.0.0.1') {
-  dataUrl = '../data/filtered-work-zones-grouped.json'; // Use non-gzipped for local dev
-  console.log('Running locally, using .json data file.');
-} else {
-  dataUrl = '../data/filtered-work-zones-grouped.json.gz'; // Use gzipped for production/other envs
-}
+let dataUrl = '../data/filtered-work-zones-grouped.json';
+// const hostname = window.location.hostname;
+// if (hostname === 'localhost' || hostname === '127.0.0.1') {
+//   dataUrl = '../data/filtered-work-zones-grouped.json'; // Use non-gzipped for local dev
+//   console.log('Running locally, using .json data file.');
+// } else {
+//   dataUrl = '../data/filtered-work-zones-grouped.json.gz'; // Use gzipped for production/other envs
+// }
 
 // Placeholder type for insufficient data intervals
 const INSUFFICIENT_DATA_PLACEHOLDER = 'insufficient_control_data';
