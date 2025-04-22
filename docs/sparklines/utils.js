@@ -263,6 +263,7 @@ function plotVehicleSpeed(vehicleData) {
     x: {
       type: 'time',
       label: 'Time',
+      tickFormat: d3.timeFormat('%I:%M %p'), // Format ticks as HH:MM AM/PM
     },
     y: {
       grid: true,
