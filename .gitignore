@@ -1,3 +1,5 @@
+node_modules/
+
 # Ignore data files
 /raw_data/*.sav
 /data/
