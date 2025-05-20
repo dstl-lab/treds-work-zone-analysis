@@ -37,7 +37,7 @@ import * as d3 from 'd3';
 import * as Plot from '@observablehq/plot';
 
 // Determine data URL based on hostname
-let dataUrl = '../data/filtered-work-zones-grouped.json';
+let dataUrl = '../data/sparklines-data.json';
 // const hostname = window.location.hostname;
 // if (hostname === 'localhost' || hostname === '127.0.0.1') {
 //   dataUrl = '../data/filtered-work-zones-grouped.json'; // Use non-gzipped for local dev
