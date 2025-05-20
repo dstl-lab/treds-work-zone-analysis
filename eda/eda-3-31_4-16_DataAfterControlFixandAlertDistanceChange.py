@@ -2,8 +2,6 @@
 import pandas as pd
 import numpy as np
 import json
-import math
-import gzip
 
 from utils import (
     plot_vehicle_data,
@@ -95,6 +93,10 @@ df
 
 # %%
 # Group data and save to JSON in the desired nested format
+
+min_vehicles_per_workzone = 25
+
+# columns that are are the same for a given vehicle_id
 static_cols = [
     "vehicle_id",
     "district",
@@ -105,12 +107,21 @@ static_cols = [
     "cause",
     "message",
 ]
+
+# columns that are different for a given vehicle_id
 timeseries_cols = [
     "event_time",
     "speed",
-    "longitude",
-    "latitude",
+    "acceleration",
 ]
+
+# precision for float columns
+precision_map = {
+    "speed": 1,  # e.g., 66.4
+    "acceleration": 1,  # e.g., 66.4
+    "longitude": 5,  # e.g., -115.74542
+    "latitude": 5,  # e.g., 33.07761
+}
 
 
 # Helper to safely round floats, handling NaN
@@ -125,29 +136,20 @@ def round_float(value, precision):
     return value  # Return original value if not float or NaN
 
 
-# Define precision for remaining float columns
-precision_map = {
-    "speed": 1,  # e.g., 66.4
-    "longitude": 5,  # e.g., -115.74542
-    "latitude": 5,  # e.g., 33.07761
-    # No need for bearing/acceleration precision
-}
-
-
-def process_vehicle_group_revised(group):
+def process_one_vehicle(group):
     """
-    Processes a DataFrame group for a single vehicle into a more compact
-    nested dictionary format for JSON serialization. Reduces float precision,
-    removes specified columns, keeps original timestamp format and record structure.
+    Processes a DataFrame group for a single vehicle into a more compact nested
+    dictionary format for JSON serialization. Reduces float precision, removes
+    specified columns, keeps original timestamp format and record structure.
     """
     # Extract static data from the first row
     static_data = group.iloc[0][static_cols].to_dict()
     static_data["visit_date"] = static_data["visit_date"].isoformat()
     static_data["is_control_group"] = bool(static_data["is_control_group"])
     # Replace NaN message with None for JSON compatibility
-    if pd.isna(static_data["message"]):
-        static_data["message"] = None
-    # Add handling for other potential NaNs in static data if necessary
+    for col in static_cols:
+        if pd.isna(static_data[col]):
+            static_data[col] = None
 
     # Prepare time-series data
     timeseries_df = group[
@@ -184,41 +186,48 @@ def process_vehicle_group_revised(group):
 
 
 print("Grouping data for JSON export...")
-# Filter workzones with at least 10 vehicles
-print("Filtering workzones with at least 10 vehicles...")
+print(
+    f"Filtering workzones with at least {min_vehicles_per_workzone} vehicles..."
+)
 workzone_counts = df.groupby("workzone_id")["vehicle_id"].nunique()
-valid_workzones = workzone_counts[workzone_counts >= 10].index
+valid_workzones = workzone_counts[
+    workzone_counts >= min_vehicles_per_workzone
+].index
 df_filtered = df[df["workzone_id"].isin(valid_workzones)].copy()
 print(
     f"Filtered dataframe contains {len(df_filtered)} rows "
     f"from {len(valid_workzones)} workzones."
 )
+# %%
+by_workzone = (
+    df_filtered.groupby(["workzone_id", "vehicle_id"])[
+        static_cols + timeseries_cols
+    ]
+    .apply(process_one_vehicle)
+    .groupby(level="workzone_id")
+    .agg(list)
+)
 
-# Use the revised processing function
-grouped_list = [
-    process_vehicle_group_revised(group)  # Use the revised function
-    for _, group in df_filtered.groupby("vehicle_id")
-]
+# %%
+output_folder = Path("../docs/data/workzones")
+output_folder.mkdir(parents=True, exist_ok=True)
+for workzone_id, data in by_workzone.items():
+    output_path = output_folder / f"{workzone_id}.json"
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, separators=(",", ":"))
+    print(f"Successfully saved {output_path}")
 
-# Save as compressed JSON (.json.gz)
-# output_path = Path(
-#     "../docs/data/filtered-work-zones-grouped.json.gz"
-# )  # Note the .gz extension
-# print(f"Saving grouped data to {output_path}...")
-
-# # Use gzip.open with 'wt' mode for writing text
-# with gzip.open(output_path, "wt", encoding="utf-8") as f:
-#     # Use compact separators for smallest size
-#     json.dump(grouped_list, f, separators=(",", ":"))
-
-# print(f"Successfully saved grouped data to {output_path}")
-
-output_path_json = Path("../docs/data/filtered-work-zones-grouped.json")
-print(f"Saving grouped data to {output_path_json}...")
-with open(output_path_json, "w", encoding="utf-8") as f:
-    json.dump(grouped_list, f, separators=(",", ":"))
-print(f"Successfully saved grouped data to {output_path_json}")
-
+# %%
+meta_file = Path("../docs/data/workzones-metadata.json")
+(
+    by_workzone.apply(len)
+    .rename("n")
+    .sort_values(ascending=False)
+    .to_frame()
+    .reset_index()
+    .to_json(meta_file, orient="records")
+)
+print(f"Successfully saved {meta_file}")
 
 # %%
 # vehicle_id	265851
@@ -248,8 +257,12 @@ df["vehicle_id"].value_counts()
 
 # %%
 v1 = df.query("vehicle_id == 347303")
-v1[["event_time", "speed"]].plot(x="event_time", y="speed")
+v1.plot(x="event_time", y="speed")
 
 # %%
 v1 = df.query("vehicle_id == 339306")
-v1[["event_time", "speed"]].plot(x="event_time", y="speed")
+v1.plot(x="event_time", y="speed")
+# v1.plot(x="event_time", y="acceleration")
+
+# %%
+v1
