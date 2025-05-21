@@ -20,7 +20,7 @@ const TimeWindowSelector: React.FC<TimeWindowSelectorProps> = ({
   onWindowChange,
 }) => {
   return (
-    <div className='mb-4 flex items-center space-x-2'>
+    <div className='mb-2 flex items-center space-x-2'>
       <label className='mr-2'>Time Window Duration:</label>
       {windowOptions.map((option) => (
         <button

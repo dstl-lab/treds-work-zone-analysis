@@ -4,11 +4,13 @@ import Sparkline from './Sparkline';
 interface SparklinePlotsProps {
   resampledData: ResampledData[];
   minControlVehicles: number;
+  selectedPlotType: string;
 }
 
 function SparklinePlots({
   resampledData,
   minControlVehicles,
+  selectedPlotType,
 }: SparklinePlotsProps) {
   return (
     <div>
@@ -47,6 +49,7 @@ function SparklinePlots({
                         <Sparkline
                           key={vehicle.vehicle_id}
                           vehicleData={vehicle}
+                          selectedPlotType={selectedPlotType}
                         />
                       ),
                     )
@@ -66,6 +69,7 @@ function SparklinePlots({
                         <Sparkline
                           key={vehicle.vehicle_id}
                           vehicleData={vehicle}
+                          selectedPlotType={selectedPlotType}
                         />
                       ),
                     )

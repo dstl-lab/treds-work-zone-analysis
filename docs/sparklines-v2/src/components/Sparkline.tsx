@@ -5,9 +5,13 @@ import type { VehicleData } from '../types'; // Import the types
 
 interface SparklineProps {
   vehicleData: VehicleData;
+  selectedPlotType: 'speed' | 'acceleration';
 }
 
-export default function Sparkline({ vehicleData }: SparklineProps) {
+export default function Sparkline({
+  vehicleData,
+  selectedPlotType,
+}: SparklineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const {
     data: data,
@@ -40,7 +44,7 @@ export default function Sparkline({ vehicleData }: SparklineProps) {
       marks: [
         Plot.lineY(data, {
           x: 'event_time',
-          y: 'speed',
+          y: selectedPlotType === 'speed' ? 'speed' : 'acceleration',
           stroke: 'steelblue',
         }),
         Plot.ruleX([visitDate], {
@@ -59,8 +63,8 @@ export default function Sparkline({ vehicleData }: SparklineProps) {
       },
       y: {
         grid: true,
-        label: 'Speed (mph)',
-        domain: [0, 70],
+        label: selectedPlotType === 'speed' ? 'Speed (mph)' : 'Acceleration',
+        domain: selectedPlotType === 'speed' ? [0, 70] : [-2, 2],
       },
       width: 200,
       height: 100,
@@ -69,7 +73,7 @@ export default function Sparkline({ vehicleData }: SparklineProps) {
     if (plot) {
       containerRef.current.appendChild(plot);
     }
-  }, [data, vehicleId, visitDate]); // Dependencies for useEffect
+  }, [data, vehicleId, visitDate, selectedPlotType]); // Dependencies for useEffect
 
   return <div ref={containerRef} className='vehicle-plot-container' />;
 }

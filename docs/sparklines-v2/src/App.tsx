@@ -5,6 +5,7 @@ import TimeWindowSelector from './components/TimeWindowSelector';
 import WorkzoneSelector from './components/WorkzoneSelector';
 import WorkzoneInfo from './components/WorkzoneInfo';
 import SparklinePlots from './components/SparklinePlots';
+import PlotTypeSelector from './components/PlotTypeSelector';
 import { metadata, loadVehicleData, resampleVehicleData } from './utils';
 import type { ResampledData, VehicleData } from './types';
 
@@ -12,6 +13,7 @@ function App() {
   const [selectedWorkzone, setSelectedWorkzone] = useState<string | null>(null);
   const [minControlVehicles, setMinControlVehicles] = useState<number>(1);
   const [selectedWindow, setSelectedWindow] = useState<number>(120); // Default to 2 hours (120 minutes)
+  const [selectedPlotType, setSelectedPlotType] = useState<string>('speed');
   const [vehicleData, setVehicleData] = useState<VehicleData[]>([]);
   const [resampledData, setResampledData] = useState<ResampledData[]>([]);
   const [initialHashRead, setInitialHashRead] = useState(false);
@@ -23,6 +25,7 @@ function App() {
       const workzoneFromHash = params.get('workzone');
       const minControlFromHash = params.get('minControl');
       const windowFromHash = params.get('window');
+      const plotTypeFromHash = params.get('plotType');
 
       if (workzoneFromHash) {
         setSelectedWorkzone(workzoneFromHash);
@@ -35,6 +38,7 @@ function App() {
         minControlFromHash ? parseInt(minControlFromHash, 10) : 1,
       );
       setSelectedWindow(windowFromHash ? parseInt(windowFromHash, 10) : 120);
+      setSelectedPlotType(plotTypeFromHash || 'speed');
     };
 
     window.addEventListener('hashchange', updateStateFromHash);
@@ -57,8 +61,9 @@ function App() {
     }
     params.set('minControl', minControlVehicles.toString());
     params.set('window', selectedWindow.toString());
+    params.set('plotType', selectedPlotType);
     window.location.hash = params.toString();
-  }, [selectedWorkzone, minControlVehicles, selectedWindow]);
+  }, [selectedWorkzone, minControlVehicles, selectedWindow, selectedPlotType]);
 
   useEffect(() => {
     const fetchVehicleData = async () => {
@@ -101,6 +106,10 @@ function App() {
         selectedWindow={selectedWindow}
         onWindowChange={setSelectedWindow}
       />
+      <PlotTypeSelector
+        selectedPlotType={selectedPlotType}
+        onPlotTypeChange={setSelectedPlotType}
+      />
       {selectedWorkzone && metadata && (
         <WorkzoneInfo
           selectedWorkzone={selectedWorkzone}
@@ -112,6 +121,7 @@ function App() {
         <SparklinePlots
           resampledData={resampledData}
           minControlVehicles={minControlVehicles}
+          selectedPlotType={selectedPlotType}
         />
       )}
     </div>
