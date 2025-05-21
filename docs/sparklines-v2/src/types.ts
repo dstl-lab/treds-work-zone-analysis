@@ -23,10 +23,10 @@ export interface VehicleDataPoint {
   acceleration?: number;
 }
 
+// after processing, we have a list of objects with the following schema:
 export interface ResampledData {
   start_time: Date;
   end_time: Date;
   control_group_vehicles: VehicleData[]; // ordered by visit_date
   test_group_vehicles: VehicleData[]; // ordered by visit_date
-  insufficient_control_data?: boolean; // Optional flag
 }

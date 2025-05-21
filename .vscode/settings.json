@@ -1,0 +1,4 @@
+{
+  "typescript.tsdk": "docs/sparklines-v2/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}
