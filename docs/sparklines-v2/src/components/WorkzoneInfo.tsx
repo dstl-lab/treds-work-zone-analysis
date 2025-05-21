@@ -24,8 +24,8 @@ const WorkzoneInfo: React.FC<WorkzoneInfoProps> = ({
   }
 
   return (
-    <div className='my-4 p-4 border rounded-md shadow-sm'>
-      <div className='grid grid-cols-6 gap-2'>
+    <div className='my-4 p-2 border rounded-md shadow-sm'>
+      <div className='grid grid-cols-6 gap-2 text-s'>
         <div>
           <p className='font-semibold'>Workzone ID:</p>
           <p>{workzone.workzone_id}</p>
