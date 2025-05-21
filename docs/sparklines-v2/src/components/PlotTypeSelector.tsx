@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface PlotTypeSelectorProps {
-  selectedPlotType: string;
-  onPlotTypeChange: (plotType: string) => void;
+  selectedPlotType: 'speed' | 'acceleration';
+  onPlotTypeChange: (plotType: 'speed' | 'acceleration') => void;
 }
 
 const PlotTypeSelector: React.FC<PlotTypeSelectorProps> = ({
@@ -21,7 +21,9 @@ const PlotTypeSelector: React.FC<PlotTypeSelectorProps> = ({
         {plotTypes.map((type) => (
           <button
             key={type.value}
-            onClick={() => onPlotTypeChange(type.value)}
+            onClick={() =>
+              onPlotTypeChange(type.value as 'speed' | 'acceleration')
+            }
             className={`text-xs m-1 p-1 border rounded ${
               selectedPlotType === type.value
                 ? 'bg-blue-500 text-white'

@@ -4,7 +4,7 @@ import Sparkline from './Sparkline';
 interface SparklinePlotsProps {
   resampledData: ResampledData[];
   minControlVehicles: number;
-  selectedPlotType: string;
+  selectedPlotType: 'speed' | 'acceleration';
 }
 
 function SparklinePlots({

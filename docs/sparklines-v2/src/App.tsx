@@ -13,7 +13,9 @@ function App() {
   const [selectedWorkzone, setSelectedWorkzone] = useState<string | null>(null);
   const [minControlVehicles, setMinControlVehicles] = useState<number>(1);
   const [selectedWindow, setSelectedWindow] = useState<number>(120); // Default to 2 hours (120 minutes)
-  const [selectedPlotType, setSelectedPlotType] = useState<string>('speed');
+  const [selectedPlotType, setSelectedPlotType] = useState<
+    'speed' | 'acceleration'
+  >('speed');
   const [vehicleData, setVehicleData] = useState<VehicleData[]>([]);
   const [resampledData, setResampledData] = useState<ResampledData[]>([]);
   const [initialHashRead, setInitialHashRead] = useState(false);
@@ -38,7 +40,7 @@ function App() {
         minControlFromHash ? parseInt(minControlFromHash, 10) : 1,
       );
       setSelectedWindow(windowFromHash ? parseInt(windowFromHash, 10) : 120);
-      setSelectedPlotType(plotTypeFromHash || 'speed');
+      setSelectedPlotType(plotTypeFromHash as 'speed' | 'acceleration');
     };
 
     window.addEventListener('hashchange', updateStateFromHash);

@@ -1,4 +1,3 @@
-import * as d3 from 'd3';
 import type { ResampledData, VehicleData } from '@/types';
 
 import metadata from '@/data/workzones-metadata.json';
