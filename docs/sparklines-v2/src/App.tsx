@@ -40,7 +40,11 @@ function App() {
         minControlFromHash ? parseInt(minControlFromHash, 10) : 1,
       );
       setSelectedWindow(windowFromHash ? parseInt(windowFromHash, 10) : 120);
-      setSelectedPlotType(plotTypeFromHash as 'speed' | 'acceleration');
+      setSelectedPlotType(
+        plotTypeFromHash
+          ? (plotTypeFromHash as 'speed' | 'acceleration')
+          : 'speed',
+      );
     };
 
     window.addEventListener('hashchange', updateStateFromHash);
