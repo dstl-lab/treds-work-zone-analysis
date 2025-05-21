@@ -14,12 +14,51 @@ function App() {
   const [selectedWindow, setSelectedWindow] = useState<number>(120); // Default to 2 hours (120 minutes)
   const [vehicleData, setVehicleData] = useState<VehicleData[]>([]);
   const [resampledData, setResampledData] = useState<ResampledData[]>([]);
+  const [initialHashRead, setInitialHashRead] = useState(false);
 
   useEffect(() => {
-    if (metadata.length > 0) {
-      setSelectedWorkzone(metadata[0].workzone_id);
-    }
+    const updateStateFromHash = () => {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const workzoneFromHash = params.get('workzone');
+      const minControlFromHash = params.get('minControl');
+      const windowFromHash = params.get('window');
+
+      if (workzoneFromHash) {
+        setSelectedWorkzone(workzoneFromHash);
+      } else if (metadata.length > 0) {
+        setSelectedWorkzone(metadata[0].workzone_id);
+      }
+
+      // Set to default if not in hash, otherwise parse
+      setMinControlVehicles(
+        minControlFromHash ? parseInt(minControlFromHash, 10) : 1,
+      );
+      setSelectedWindow(windowFromHash ? parseInt(windowFromHash, 10) : 120);
+    };
+
+    window.addEventListener('hashchange', updateStateFromHash);
+
+    updateStateFromHash();
+    setInitialHashRead(true);
+
+    return () => {
+      window.removeEventListener('hashchange', updateStateFromHash);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!initialHashRead) {
+      return; // Don't update hash until initial read is complete
+    }
+    const params = new URLSearchParams();
+    if (selectedWorkzone) {
+      params.set('workzone', selectedWorkzone);
+    }
+    params.set('minControl', minControlVehicles.toString());
+    params.set('window', selectedWindow.toString());
+    window.location.hash = params.toString();
+  }, [selectedWorkzone, minControlVehicles, selectedWindow]);
 
   useEffect(() => {
     const fetchVehicleData = async () => {
