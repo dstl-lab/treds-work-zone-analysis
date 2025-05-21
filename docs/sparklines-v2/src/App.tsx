@@ -3,6 +3,7 @@ import './App.css';
 import MinControlVehicles from './components/MinControlVehicles';
 import TimeWindowSelector from './components/TimeWindowSelector';
 import WorkzoneSelector from './components/WorkzoneSelector';
+import WorkzoneInfo from './components/WorkzoneInfo';
 import SparklinePlots from './components/SparklinePlots';
 import { metadata, loadVehicleData, resampleVehicleData } from './utils';
 import type { ResampledData, VehicleData } from './types';
@@ -61,6 +62,13 @@ function App() {
         selectedWindow={selectedWindow}
         onWindowChange={setSelectedWindow}
       />
+      {selectedWorkzone && metadata && (
+        <WorkzoneInfo
+          selectedWorkzone={selectedWorkzone}
+          metadata={metadata}
+          vehicleData={vehicleData}
+        />
+      )}
       {resampledData && (
         <SparklinePlots
           resampledData={resampledData}
