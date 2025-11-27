@@ -1,0 +1,1 @@
+var e=``+new URL(`data_0-C87SonOn.parquet`,import.meta.url).href;export{e as default};

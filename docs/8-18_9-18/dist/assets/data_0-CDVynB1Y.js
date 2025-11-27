@@ -1,0 +1,1 @@
+var e=``+new URL(`data_0-9L7SnUg8.parquet`,import.meta.url).href;export{e as default};

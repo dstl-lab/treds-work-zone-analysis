@@ -1,0 +1,1 @@
+var e=``+new URL(`data_0-B4x-IQ54.parquet`,import.meta.url).href;export{e as default};

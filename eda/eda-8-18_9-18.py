@@ -14,7 +14,7 @@ plt.rcParams["figure.figsize"] = (10, 5)
 project_root = Path(__file__).resolve().parent.parent
 
 data = project_root / "data" / "8-18_9-18.parquet"
-output_dir = project_root / "data" / "8-18_9-18"
+output_dir = project_root / "docs" / "8-18_9-18" / "src" / "data"
 output_dir.mkdir(parents=True, exist_ok=True)
 
 sql("INSTALL spatial")
@@ -258,11 +258,10 @@ sns.scatterplot(
     alpha=0.2,
 )
 # %%
-df
-# %%
-workzone_id = "8-15200"
+# workzone_id = "8-15200"
 # vid = 532633
-vid = 483454
+# vid = 483454
+vid = 483528
 df = sql(f"""
 WITH points AS (
     SELECT
@@ -297,6 +296,7 @@ sns.lineplot(
     markers=True,
     sort=False,
     marker="o",
+    errorbar=None,
 )
 
 # %%
