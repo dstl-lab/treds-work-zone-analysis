@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
-import * as d3 from 'd3';
 import type { VehicleData } from '@/types';
 import { colors } from '@/utils';
+import * as d3 from 'd3';
+import { useEffect, useRef } from 'react';
 
 interface VehicleTimelineProps {
   data: VehicleData[];

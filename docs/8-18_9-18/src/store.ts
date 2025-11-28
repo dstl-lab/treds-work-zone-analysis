@@ -5,10 +5,12 @@ import { workzones } from '@/utils';
 
 interface AppState {
   workzoneId: string;
+  scrollTimestamp: number | null; // leftmost visible timestamp in ms
 }
 
 interface Actions {
   setWorkzoneId: (id: string) => void;
+  setScrollTimestamp: (timestamp: number | null) => void;
 }
 
 type StoreState = AppState & Actions;
@@ -39,7 +41,9 @@ export const useStore = create<StoreState>()(
   persist(
     (set) => ({
       workzoneId: firstWorkzoneId,
+      scrollTimestamp: null,
       setWorkzoneId: (id) => set({ workzoneId: id }),
+      setScrollTimestamp: (timestamp) => set({ scrollTimestamp: timestamp }),
     }),
     {
       name: 'state',

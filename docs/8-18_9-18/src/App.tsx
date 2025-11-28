@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-import WorkzoneSelector from '@/components/WorkzoneSelector';
+import SpeedPlots from '@/components/SpeedPlots';
 import WorkzoneMeta from '@/components/WorkzoneMeta';
-import VehicleTimeline from '@/components/VehicleTimeline';
-import SyncedSpeedPlots from '@/components/SyncedSpeedPlots';
-import { loadVehicleData } from '@/utils';
+import WorkzoneSelector from '@/components/WorkzoneSelector';
 import { useStore } from '@/store';
 import type { VehicleData } from '@/types';
+import { loadVehicleData } from '@/utils';
+import { useEffect, useState } from 'react';
 
 function App() {
   const workzoneId = useStore((state) => state.workzoneId);
@@ -38,21 +37,12 @@ function App() {
         <div className='mt-2 space-y-4'>
           <WorkzoneSelector />
           <WorkzoneMeta />
-          {loading ? (
-            <div className='bg-white rounded-lg border border-gray-200 p-6'>
-              <p className='text-gray-500 text-center'>
-                Loading vehicle data...
-              </p>
-            </div>
-          ) : (
-            <VehicleTimeline data={vehicleData} />
-          )}
         </div>
       </div>
 
       {!loading && (
         <div className='mt-4 px-4 w-full'>
-          <SyncedSpeedPlots data={vehicleData} />
+          <SpeedPlots data={vehicleData} />
         </div>
       )}
     </div>
