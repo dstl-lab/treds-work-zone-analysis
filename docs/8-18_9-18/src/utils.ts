@@ -1,4 +1,4 @@
-import { asyncBufferFromUrl, parquetReadObjects } from 'hyparquet';
+import { parquetReadObjects } from 'hyparquet';
 import * as d3 from 'd3';
 import type { WorkzoneMetadata, VehicleData } from '@/types';
 
@@ -26,7 +26,17 @@ export async function loadVehicleData(
     `@/data/vehicles/workzone_id=${workzoneId}/data_0.parquet`
   );
   const url = dataModule.default;
-  const file = await asyncBufferFromUrl({ url });
+
+  // Fetch entire file as ArrayBuffer (GitHub Pages doesn't support range requests)
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+
+  // Create an AsyncBuffer-compatible wrapper around the ArrayBuffer
+  const file = {
+    byteLength: arrayBuffer.byteLength,
+    slice: (start: number, end?: number) => arrayBuffer.slice(start, end),
+  };
+
   const objects = await parquetReadObjects({ file });
   return objects as VehicleData[];
 }
