@@ -32,9 +32,9 @@ export default function VehicleTimeline({ data }: VehicleTimelineProps) {
     })).sort((a, b) => a.date.getTime() - b.date.getTime());
 
     // Chart dimensions
-    const margin = { top: 24, right: 24, bottom: 48, left: 56 };
+    const margin = { top: 16, right: 24, bottom: 48, left: 56 };
     const width = 800;
-    const height = 200;
+    const height = 150;
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
