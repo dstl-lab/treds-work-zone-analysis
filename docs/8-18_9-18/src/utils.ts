@@ -1,7 +1,18 @@
 import { asyncBufferFromUrl, parquetReadObjects } from 'hyparquet';
+import * as d3 from 'd3';
 import type { WorkzoneMetadata, VehicleData } from '@/types';
 
 import workzonesJSONL from '@/data/workzones.json?raw';
+
+// https://d3js.org/d3-scale-chromatic/categorical#schemeTableau10
+export const colors = {
+  blue: d3.schemeTableau10[0],
+  orange: d3.schemeTableau10[1],
+  red: d3.schemeTableau10[2],
+  lightblue: d3.schemeTableau10[3],
+  green: d3.schemeTableau10[4],
+  yellow: d3.schemeTableau10[5],
+} as const;
 
 export const workzones: WorkzoneMetadata[] = workzonesJSONL
   .trim()
@@ -19,5 +30,3 @@ export async function loadVehicleData(
   const objects = await parquetReadObjects({ file });
   return objects as VehicleData[];
 }
-
-loadVehicleData('8-15200');
