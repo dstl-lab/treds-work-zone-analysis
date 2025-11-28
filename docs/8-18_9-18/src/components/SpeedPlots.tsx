@@ -2,7 +2,7 @@ import { useStore } from '@/store';
 import type { VehicleData } from '@/types';
 import { colors } from '@/utils';
 import * as d3 from 'd3';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 interface SpeedPlotsProps {
   data: VehicleData[];
@@ -27,15 +27,18 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
   const brushRef = useRef<SVGGElement | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const hasRestoredScroll = useRef(false);
-  const [containerWidth, setContainerWidth] = useState(800);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const { scrollTimestamp, setScrollTimestamp } = useStore();
 
   const testCount = data.filter((d) => !d.is_control_group).length;
   const controlCount = data.filter((d) => d.is_control_group).length;
 
-  // Handle resize
-  useEffect(() => {
+  // Measure container width synchronously before paint to avoid flash
+  useLayoutEffect(() => {
     if (!containerRef.current) return;
+
+    // Get initial measurement synchronously
+    setContainerWidth(containerRef.current.getBoundingClientRect().width);
 
     const resizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0];
@@ -50,8 +53,8 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
 
   // Calculate shared time extent and dimensions
   const { timeExtent, totalWidth } = useMemo(() => {
-    if (data.length === 0) {
-      return { timeExtent: null, totalWidth: 800 };
+    if (data.length === 0 || containerWidth === null) {
+      return { timeExtent: null, totalWidth: 0 };
     }
 
     const allTimes = data.flatMap((v) =>
@@ -59,7 +62,7 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
     );
 
     if (allTimes.length === 0) {
-      return { timeExtent: null, totalWidth: 800 };
+      return { timeExtent: null, totalWidth: 0 };
     }
 
     const extent = d3.extent(allTimes) as [Date, Date];
@@ -254,6 +257,14 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
 
   // Calculate brush dimensions based on viewport vs total scrollable width
   const brushDimensions = useMemo(() => {
+    if (containerWidth === null) {
+      return {
+        overviewWidth: 0,
+        viewportWidth: 0,
+        scrollableWidth: 0,
+        brushWidth: 0,
+      };
+    }
     const overviewWidth = containerWidth - MARGIN.left - MARGIN.right;
     const viewportWidth = containerWidth - MARGIN.left;
     const scrollableWidth = totalWidth;
@@ -594,7 +605,8 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
 
   // Render minimum speed scatter plot (non-scrollable)
   useEffect(() => {
-    if (!minScatterRef.current || !timeExtent) return;
+    if (!minScatterRef.current || !timeExtent || containerWidth === null)
+      return;
 
     d3.select(minScatterRef.current).selectAll('*').remove();
 
@@ -754,6 +766,10 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
     const brushGroup = svg.append('g').attr('class', 'brush-overlay');
     brushRef.current = brushGroup.node();
 
+    // Arrow dimensions (defined early for use in moveBrushTo)
+    const arrowSize = 6;
+    const arrowY = MARGIN.top + arrowSize + 4; // Position near top of brush
+
     // Helper to move brush and scroll to a given x position
     const moveBrushTo = (clickX: number) => {
       const minX = MARGIN.left;
@@ -762,6 +778,24 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
 
       // Update brush position
       brushGroup.select('.brush-rect').attr('x', newX);
+
+      // Update arrow positions (facing outward)
+      brushGroup
+        .select('.brush-arrow-left')
+        .attr(
+          'd',
+          `M${newX - 2 - arrowSize},${arrowY} l${arrowSize},${
+            -arrowSize / 1.5
+          } l0,${arrowSize * 1.33} Z`,
+        );
+      brushGroup
+        .select('.brush-arrow-right')
+        .attr(
+          'd',
+          `M${newX + brushWidth + 2 + arrowSize},${arrowY} l${-arrowSize},${
+            -arrowSize / 1.5
+          } l0,${arrowSize * 1.33} Z`,
+        );
 
       // Convert brush position to scroll position
       const brushOffset = newX - MARGIN.left;
@@ -792,7 +826,7 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
     // Brush rectangle (the viewport indicator)
     const brushRect = brushGroup
       .append('rect')
-      .attr('class', 'brush-rect')
+      .attr('class', 'brush-rect marching-ants')
       .attr('x', brushX)
       .attr('y', MARGIN.top)
       .attr('width', brushWidth)
@@ -800,8 +834,37 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
       .attr('fill', 'rgba(59, 130, 246, 0.1)')
       .attr('stroke', 'rgb(59, 130, 246)')
       .attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '4,4')
       .attr('rx', 2)
       .style('cursor', 'grab');
+
+    // Left arrow (pointing left/outward)
+    brushGroup
+      .append('path')
+      .attr('class', 'brush-arrow-left')
+      .attr(
+        'd',
+        `M${brushX - 2 - arrowSize},${arrowY} l${arrowSize},${
+          -arrowSize / 1.5
+        } l0,${arrowSize * 1.33} Z`,
+      )
+      .attr('fill', 'rgb(59, 130, 246)')
+      .attr('opacity', 0.7)
+      .style('pointer-events', 'none');
+
+    // Right arrow (pointing right/outward)
+    brushGroup
+      .append('path')
+      .attr('class', 'brush-arrow-right')
+      .attr(
+        'd',
+        `M${brushX + brushWidth + 2 + arrowSize},${arrowY} l${-arrowSize},${
+          -arrowSize / 1.5
+        } l0,${arrowSize * 1.33} Z`,
+      )
+      .attr('fill', 'rgb(59, 130, 246)')
+      .attr('opacity', 0.7)
+      .style('pointer-events', 'none');
 
     // Drag behavior
     const drag = d3
@@ -817,6 +880,24 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
 
         // Update brush position
         d3.select(this).attr('x', newX);
+
+        // Update arrow positions (facing outward)
+        brushGroup
+          .select('.brush-arrow-left')
+          .attr(
+            'd',
+            `M${newX - 2 - arrowSize},${arrowY} l${arrowSize},${
+              -arrowSize / 1.5
+            } l0,${arrowSize * 1.33} Z`,
+          );
+        brushGroup
+          .select('.brush-arrow-right')
+          .attr(
+            'd',
+            `M${newX + brushWidth + 2 + arrowSize},${arrowY} l${-arrowSize},${
+              -arrowSize / 1.5
+            } l0,${arrowSize * 1.33} Z`,
+          );
 
         // Convert brush position to scroll position
         const brushOffset = newX - MARGIN.left;
@@ -848,7 +929,11 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
     if (!scrollContainerRef.current || !timeExtent) return;
 
     const scrollEl = scrollContainerRef.current;
-    const { overviewWidth, scrollableWidth } = brushDimensions;
+    const { overviewWidth, scrollableWidth, brushWidth } = brushDimensions;
+
+    // Arrow dimensions for position updates
+    const arrowSize = 6;
+    const arrowY = MARGIN.top + arrowSize + 4; // Position near top of brush
 
     // Create scale for converting between scroll position and timestamp
     const x = d3
@@ -865,6 +950,26 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
       const newBrushX = MARGIN.left + brushRatio * overviewWidth;
 
       brushGroup.select('.brush-rect').attr('x', newBrushX);
+
+      // Update arrow positions (facing outward)
+      brushGroup
+        .select('.brush-arrow-left')
+        .attr(
+          'd',
+          `M${newBrushX - 2 - arrowSize},${arrowY} l${arrowSize},${
+            -arrowSize / 1.5
+          } l0,${arrowSize * 1.33} Z`,
+        );
+      brushGroup
+        .select('.brush-arrow-right')
+        .attr(
+          'd',
+          `M${
+            newBrushX + brushWidth + 2 + arrowSize
+          },${arrowY} l${-arrowSize},${-arrowSize / 1.5} l0,${
+            arrowSize * 1.33
+          } Z`,
+        );
     };
 
     // Restore scroll position from stored timestamp (only once)
@@ -908,6 +1013,20 @@ export default function SpeedPlots({ data }: SpeedPlotsProps) {
 
   const totalHeight =
     HEADER_HEIGHT + AVG_HEIGHT + GAP + HEADER_HEIGHT + RAW_HEIGHT;
+
+  // Show placeholder while measuring container width
+  if (containerWidth === null) {
+    return (
+      <div className='bg-white rounded-lg border border-gray-200 p-4'>
+        <div
+          ref={containerRef}
+          style={{
+            height: totalHeight + MIN_SCATTER_HEIGHT + HEADER_HEIGHT + 16 + 16,
+          }}
+        />
+      </div>
+    );
+  }
 
   const legend = (
     <div className='flex items-center gap-4 text-xs shrink-0'>

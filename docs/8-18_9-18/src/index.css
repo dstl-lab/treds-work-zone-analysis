@@ -1,1 +1,15 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* Marching ants animation for brush rectangle */
+@keyframes marching-ants {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+.marching-ants {
+  animation: marching-ants 1.5s linear infinite;
+}
